@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Word } from "@/types/word";
-import { getWords, shuffleWords } from "@/utils/storage";
+import { getWords } from "@/services/api";
 import Flashcard from "./Flashcard";
 
 interface FlashcardGameProps {
@@ -13,12 +13,35 @@ export default function FlashcardGame({ refresh }: FlashcardGameProps) {
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isShuffled, setIsShuffled] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [originalWords, setOriginalWords] = useState<Word[]>([]);
 
   useEffect(() => {
-    const loadedWords = getWords();
-    setWords(loadedWords);
-    setCurrentIndex(0);
+    loadWords();
   }, [refresh]);
+
+  const loadWords = async () => {
+    try {
+      setLoading(true);
+      const loadedWords = await getWords();
+      setWords(loadedWords);
+      setOriginalWords(loadedWords);
+      setCurrentIndex(0);
+    } catch (error) {
+      console.error("Error loading words:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const shuffleArray = (array: Word[]) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
 
   const handleNext = () => {
     if (currentIndex < words.length - 1) {
@@ -33,17 +56,26 @@ export default function FlashcardGame({ refresh }: FlashcardGameProps) {
   };
 
   const handleShuffle = () => {
-    const shuffled = shuffleWords(words);
+    const shuffled = shuffleArray(words);
     setWords(shuffled);
     setCurrentIndex(0);
     setIsShuffled(true);
   };
 
   const handleReset = () => {
-    setWords(getWords());
+    setWords(originalWords);
     setCurrentIndex(0);
     setIsShuffled(false);
   };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Study</h2>
+        <p className="text-gray-500 text-center py-8">Loading...</p>
+      </div>
+    );
+  }
 
   if (words.length === 0) {
     return (

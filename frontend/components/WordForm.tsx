@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { addWord } from "@/services/api";
 
 interface WordFormProps {
   onWordAdded: () => void;
@@ -10,8 +11,9 @@ export default function WordForm({ onWordAdded }: WordFormProps) {
   const [english, setEnglish] = useState("");
   const [vietnamese, setVietnamese] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!english.trim() || !vietnamese.trim()) {
@@ -19,16 +21,22 @@ export default function WordForm({ onWordAdded }: WordFormProps) {
       return;
     }
 
-    // Import dynamically to avoid SSR issues
-    import("@/utils/storage").then(({ addWord }) => {
-      addWord(english.trim(), vietnamese.trim());
+    try {
+      setLoading(true);
+      await addWord(english.trim(), vietnamese.trim());
       setEnglish("");
       setVietnamese("");
       setMessage("Word added successfully! ✅");
       onWordAdded();
 
       setTimeout(() => setMessage(""), 3000);
-    });
+    } catch (error) {
+      console.error("Error adding word:", error);
+      setMessage("Failed to add word ❌");
+      setTimeout(() => setMessage(""), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,9 +79,10 @@ export default function WordForm({ onWordAdded }: WordFormProps) {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          Add Word
+          {loading ? "Adding..." : "Add Word"}
         </button>
 
         {message && (

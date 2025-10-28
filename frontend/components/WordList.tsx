@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Word } from "@/types/word";
-import { getWords, deleteWord } from "@/utils/storage";
+import { getWords, deleteWord } from "@/services/api";
 
 interface WordListProps {
   refresh: number;
@@ -10,17 +10,44 @@ interface WordListProps {
 
 export default function WordList({ refresh }: WordListProps) {
   const [words, setWords] = useState<Word[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setWords(getWords());
+    loadWords();
   }, [refresh]);
 
-  const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this word?")) {
-      deleteWord(id);
-      setWords(getWords());
+  const loadWords = async () => {
+    try {
+      setLoading(true);
+      const data = await getWords();
+      setWords(data);
+    } catch (error) {
+      console.error("Error loading words:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this word?")) {
+      try {
+        await deleteWord(id);
+        await loadWords();
+      } catch (error) {
+        console.error("Error deleting word:", error);
+        alert("Failed to delete word");
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Word List</h2>
+        <p className="text-gray-500 text-center py-8">Loading...</p>
+      </div>
+    );
+  }
 
   if (words.length === 0) {
     return (

@@ -29,7 +29,7 @@ export class WordsController {
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.wordsService.findOne(+id);
+    return this.wordsService.findOne(id);
   }
 
   @Post()
@@ -40,12 +40,12 @@ export class WordsController {
 
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateWordDto: UpdateWordDto) {
-    return this.wordsService.update(+id, updateWordDto);
+    return this.wordsService.update(id, updateWordDto);
   }
 
   @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param("id") id: string) {
-    return this.wordsService.remove(+id);
+    return this.wordsService.remove(id);
   }
 }

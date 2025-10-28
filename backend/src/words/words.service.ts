@@ -1,25 +1,23 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Word } from "./word.entity";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { Word, WordDocument } from "./word.schema";
 import { CreateWordDto } from "./dto/create-word.dto";
 import { UpdateWordDto } from "./dto/update-word.dto";
 
 @Injectable()
 export class WordsService {
   constructor(
-    @InjectRepository(Word)
-    private wordsRepository: Repository<Word>
+    @InjectModel(Word.name)
+    private wordModel: Model<WordDocument>
   ) {}
 
   async findAll(): Promise<Word[]> {
-    return this.wordsRepository.find({
-      order: { createdAt: "DESC" },
-    });
+    return this.wordModel.find().sort({ createdAt: -1 }).exec();
   }
 
-  async findOne(id: number): Promise<Word> {
-    const word = await this.wordsRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Word> {
+    const word = await this.wordModel.findById(id).exec();
     if (!word) {
       throw new NotFoundException(`Word with ID ${id} not found`);
     }
@@ -27,22 +25,28 @@ export class WordsService {
   }
 
   async create(createWordDto: CreateWordDto): Promise<Word> {
-    const word = this.wordsRepository.create(createWordDto);
-    return this.wordsRepository.save(word);
+    const word = new this.wordModel(createWordDto);
+    return word.save();
   }
 
-  async update(id: number, updateWordDto: UpdateWordDto): Promise<Word> {
-    const word = await this.findOne(id);
-    Object.assign(word, updateWordDto);
-    return this.wordsRepository.save(word);
+  async update(id: string, updateWordDto: UpdateWordDto): Promise<Word> {
+    const word = await this.wordModel
+      .findByIdAndUpdate(id, updateWordDto, { new: true })
+      .exec();
+    if (!word) {
+      throw new NotFoundException(`Word with ID ${id} not found`);
+    }
+    return word;
   }
 
-  async remove(id: number): Promise<void> {
-    const word = await this.findOne(id);
-    await this.wordsRepository.remove(word);
+  async remove(id: string): Promise<void> {
+    const result = await this.wordModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Word with ID ${id} not found`);
+    }
   }
 
   async count(): Promise<number> {
-    return this.wordsRepository.count();
+    return this.wordModel.countDocuments().exec();
   }
 }

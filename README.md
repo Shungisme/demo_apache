@@ -1,184 +1,253 @@
-# English Learning Application
+# 🎓 English Learning Application
 
-A full-stack English learning application with flashcards - Built with Next.js and NestJS.
+A full-stack flashcard application for learning English vocabulary - Built with Next.js, NestJS, and MongoDB.
+
+---
+
+## � Quick Start
+
+### Prerequisites
+
+- **Node.js** (v16+)
+- **MongoDB**: Local OR [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register) (free cloud - recommended)
+
+### 1. Backend Setup
+
+```bash
+cd backend
+npm install
+```
+
+**Configure `.env`:**
+
+```env
+# MongoDB Atlas (recommended - no installation needed!)
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/english_learning
+
+# OR Local MongoDB
+MONGODB_URI=mongodb://localhost:27017/english_learning
+
+PORT=3001
+```
+
+**Seed database and start:**
+
+```bash
+npm run db:seed
+npm run start:dev
+```
+
+✅ Backend running at: `http://localhost:3001`
+
+### 2. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+✅ Frontend running at: `http://localhost:3000`
+
+---
 
 ## 📁 Project Structure
 
 ```
 Demo/
-├── frontend/          # Next.js frontend
-├── backend/           # NestJS backend API
-├── start-frontend.bat # Script to start frontend
-├── start-backend.bat  # Script to start backend
-├── INTEGRATION.md     # Integration guide
-└── README.md          # This file
+├── frontend/              # Next.js frontend
+│   ├── app/              # App router pages
+│   ├── components/       # React components
+│   └── types/            # TypeScript types
+├── backend/              # NestJS backend API
+│   ├── src/
+│   │   ├── words/       # Words module
+│   │   └── main.ts      # Entry point
+│   └── scripts/         # Database scripts
+└── README.md             # This file
 ```
 
-## 🚀 Quick Start
-
-### 1. Install MySQL
-
-Make sure MySQL is installed and running.
-
-Create database:
-
-```sql
-CREATE DATABASE english_learning;
-```
-
-### 2. Configure Backend
-
-```bash
-cd backend
-npm install
-```
-
-Configure `.env` file:
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=root
-DB_PASSWORD=your_password
-DB_DATABASE=english_learning
-PORT=3001
-```
-
-### 3. Install Frontend
-
-```bash
-cd frontend
-npm install
-```
-
-### 4. Start Application
-
-**Windows:**
-
-- Double click `start-backend.bat` (run first)
-- Double click `start-frontend.bat`
-
-**Linux/Mac:**
-
-```bash
-# Terminal 1
-cd backend && npm run start:dev
-
-# Terminal 2
-cd frontend && npm run dev
-```
-
-### 5. Access Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
-- **API Docs**: http://localhost:3001/words
-
-## 📚 Features
-
-### Frontend (Next.js)
-
-- ➕ Add new vocabulary
-- 📝 View word list
-- 🎓 Study with flashcards (flip cards)
-- 🔀 Shuffle cards
-- 💾 Save to database
-
-### Backend (NestJS)
-
-- 🔌 REST API
-- 💾 MySQL database with TypeORM
-- ✅ Validation
-- 🔐 CORS enabled
-- 📊 CRUD operations
-
-## 📖 Documentation
-
-- [Frontend README](./frontend/README.md) - Frontend guide
-- [Backend README](./backend/README.md) - Backend API guide
-- [Backend SETUP](./backend/SETUP.md) - Detailed setup instructions
-- [INTEGRATION](./INTEGRATION.md) - Frontend-backend integration guide
+---
 
 ## 🛠️ Tech Stack
 
-### Frontend
+| Layer          | Technology                                        |
+| -------------- | ------------------------------------------------- |
+| **Frontend**   | Next.js 14 + React 18 + TypeScript + Tailwind CSS |
+| **Backend**    | NestJS + Mongoose + TypeScript                    |
+| **Database**   | MongoDB (Atlas cloud or local)                    |
+| **Styling**    | Tailwind CSS                                      |
+| **Validation** | class-validator + class-transformer               |
 
-- Next.js 14
-- React 18
-- TypeScript
-- Tailwind CSS
+---
 
-### Backend
+## 📚 Features
 
-- NestJS
-- TypeORM
-- MySQL
-- TypeScript
+### ✨ Frontend
+
+- ➕ **Add Words**: Create English-Vietnamese vocabulary pairs
+- 📝 **Word List**: View and manage all saved words
+- 🎓 **Flashcard Game**: Study with interactive flip cards
+- 🔀 **Shuffle**: Randomize card order
+- 💾 **Persistent Storage**: Saved to MongoDB
+
+### ⚡ Backend API
+
+- 🔌 RESTful API with 6 endpoints
+- 💾 MongoDB with Mongoose ODM
+- ✅ DTO validation
+- 🔐 CORS enabled
+- 📊 Full CRUD operations
+- 🌱 Seed script with 60+ sample words
+
+---
 
 ## 📡 API Endpoints
 
-| Method | Endpoint     | Description    |
-| ------ | ------------ | -------------- |
-| GET    | `/words`     | Get all words  |
-| POST   | `/words`     | Add new word   |
-| GET    | `/words/:id` | Get word by ID |
-| PATCH  | `/words/:id` | Update word    |
-| DELETE | `/words/:id` | Delete word    |
+| Method | Endpoint       | Description    | Body                        |
+| ------ | -------------- | -------------- | --------------------------- |
+| GET    | `/words`       | Get all words  | -                           |
+| GET    | `/words/count` | Get word count | -                           |
+| GET    | `/words/:id`   | Get word by ID | -                           |
+| POST   | `/words`       | Add new word   | `{ english, vietnamese }`   |
+| PATCH  | `/words/:id`   | Update word    | `{ english?, vietnamese? }` |
+| DELETE | `/words/:id`   | Delete word    | -                           |
 
-## 🔧 Development
+**Example:**
+
+```bash
+# Get all words
+curl http://localhost:3001/words
+
+# Add a word
+curl -X POST http://localhost:3001/words \
+  -H "Content-Type: application/json" \
+  -d '{"english": "Hello", "vietnamese": "Xin chào"}'
+```
+
+---
+
+## 🔧 Available Scripts
 
 ### Backend
 
 ```bash
-cd backend
-npm run start:dev    # Development mode
-npm run build        # Build
+npm run start:dev    # Development with hot reload
+npm run build        # Build for production
 npm run start:prod   # Production mode
+npm run db:seed      # Seed database with sample words
+npm run lint         # Run ESLint
 ```
 
 ### Frontend
 
 ```bash
-cd frontend
-npm run dev         # Development mode
-npm run build       # Build
-npm run start       # Production mode
+npm run dev          # Development server (port 3000)
+npm run build        # Build for production
+npm run start        # Start production build
+npm run lint         # Run ESLint
 ```
+
+---
+
+## 💾 Database Setup Options
+
+### Option A: MongoDB Atlas (Recommended - 5 minutes)
+
+1. Sign up: [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register)
+2. Create free cluster (512MB)
+3. Create database user
+4. Whitelist IP: `0.0.0.0/0` (for development)
+5. Get connection string
+6. Paste in `backend/.env`
+
+**Benefits:**
+
+- ✅ No installation needed
+- ✅ Free 512MB storage
+- ✅ Auto backups
+- ✅ Built-in monitoring
+
+### Option B: Local MongoDB
+
+1. Download: [MongoDB Community](https://www.mongodb.com/try/download/community)
+2. Install and start MongoDB service
+3. Update `backend/.env`:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/english_learning
+   ```
+
+---
 
 ## 🐛 Troubleshooting
 
-### Backend Cannot Connect to MySQL
+### Backend cannot connect to MongoDB
 
-1. Check if MySQL is running
-2. Check credentials in `.env`
-3. Check if database exists
+**MongoDB Atlas:**
 
-### Frontend Cannot Connect to Backend
+- Check connection string in `.env`
+- Verify IP whitelist (Network Access)
+- Check database user credentials
 
-1. Check if backend is running on port 3001
-2. Check CORS in `backend/src/main.ts`
-3. Check Network tab in DevTools
+**Local MongoDB:**
 
-### Port Already in Use
+```bash
+# Check if MongoDB is running
+mongod --version
 
-- Backend: Change PORT in `backend/.env`
-- Frontend: Use `npm run dev -- -p 3002`
+# Start MongoDB
+mongod
+```
 
-## 📝 TODO / Next Steps
+### Port already in use
 
-- [ ] Add user authentication
-- [ ] Add word categories/topics
-- [ ] Add progress tracking
-- [ ] Add quiz/test features
-- [ ] Add pronunciation (text-to-speech)
-- [ ] Deploy to production
-- [ ] Add mobile responsive design
-- [ ] Add dark mode
+**Backend (3001):**
+
+```bash
+# Change port in backend/.env
+PORT=3002
+```
+
+**Frontend (3000):**
+
+```bash
+# Use different port
+npm run dev -- -p 3002
+```
+
+### Frontend cannot connect to backend
+
+1. Check backend is running: `curl http://localhost:3001/words`
+2. Check CORS settings in `backend/src/main.ts`
+3. Open browser DevTools → Network tab
+
+---
+
+## 📖 Detailed Documentation
+
+- **[Backend README](./backend/README.md)** - API documentation & setup
+- **[QUICK_START.md](./QUICK_START.md)** - Quick reference guide
+
+---
+
+## 🎯 Todo / Roadmap
+
+- [ ] User authentication (JWT)
+- [ ] User progress tracking
+- [ ] Word categories/topics
+- [ ] Quiz mode
+- [ ] Text-to-speech pronunciation
+- [ ] Spaced repetition algorithm
+- [ ] Mobile app (React Native)
+- [ ] Dark mode
+
+---
 
 ## 📄 License
 
 MIT
 
-## 👨‍💻 Author
+---
 
-English Learning Application
+**Made with ❤️ for English Learning**  
+**Tech Stack:** Next.js + NestJS + MongoDB Atlas
